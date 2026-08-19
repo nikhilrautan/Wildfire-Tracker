@@ -27,15 +27,46 @@ const MapResize = () => {
 const Map = ({ eventData = [] }) => {
   const [locationInfo, setLocationInfo] = useState(null)
 
-  // Reverse geocoding on marker click
+  // Reverse geocoding on marker click with custom User-Agent and fallback
   const handleMarkerClick = async (id, title, lat, lng) => {
-    setLocationInfo({ id, title, locationName: 'Fetching location...', lat, lng })
+    // 1. Immediately show loading state with lat/lng
+    setLocationInfo({ 
+      id, 
+      title, 
+      locationName: 'Fetching location details...', 
+      lat, 
+      lng 
+    })
+
     try {
-      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+      // 2. Fetch place name with explicit headers required by Nominatim
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
+        {
+          headers: {
+            'User-Agent': 'WildfireTrackerApp/1.0'
+          }
+        }
+      )
+
+      if (!res.ok) throw new Error('Network response was not ok')
+
       const data = await res.json()
-      setLocationInfo({ id, title, locationName: data.display_name || 'Location name not found', lat, lng })
-    } catch {
-      setLocationInfo({ id, title, locationName: 'Unable to load location', lat, lng })
+
+      // 3. Extract readable address or display fallback
+      const placeName = data.display_name || `Lat: ${lat.toFixed(2)}, Lng: ${lng.toFixed(2)}`
+
+      setLocationInfo({ id, title, locationName: placeName, lat, lng })
+    } catch (error) {
+      console.error('Reverse geocoding error:', error)
+      // Fallback display so the box still opens even if API rate-limits
+      setLocationInfo({ 
+        id, 
+        title, 
+        locationName: `Location details unavailable (${lat.toFixed(2)}°, ${lng.toFixed(2)}°)`, 
+        lat, 
+        lng 
+      })
     }
   }
 
