@@ -12,9 +12,10 @@ function App() {
       setLoading(true)
       try {
         // Updated URL with query parameters for fast response times
-        const res = await fetch(
-          'https://eonet.gsfc.nasa.gov/api/v3/events?category=wildfires&days=30&status=open'
-        )
+        // src/App.js
+const res = await fetch(
+  'https://eonet.gsfc.nasa.gov/api/v3/events?category=wildfires&days=360&status=all'
+)
         const { events } = await res.json()
 
         setEventData(events)

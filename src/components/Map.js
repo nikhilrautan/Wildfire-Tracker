@@ -62,10 +62,10 @@ const Map = ({ eventData = [] }) => {
   return (
     <div className="map-wrap">
       <MapContainer 
-        center={[20, 0]} 
-        zoom={2} 
-        style={{ height: 'calc(100vh - 70px)', width: '100vw' }}
-      >
+  center={[20, 0]} 
+  zoom={2} 
+  style={{ height: 'calc(100vh - 70px)', width: '100vw' }}
+>
         <MapResize />
 
         <LayersControl position="topright">
